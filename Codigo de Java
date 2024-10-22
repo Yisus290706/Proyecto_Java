@@ -1,0 +1,154 @@
+import java.util.ArrayList;
+import java.util.Random;
+
+enum Suite {
+HEARTS("Corazones", "♥"),
+DIAMONDS("Diamantes", "♦"),
+CLUBS("Tréboles", "♣"),
+SPADES("Picas", "♠");
+
+final String suiteName;
+final String suiteSymbol;
+
+Suite(String suiteName, String suiteSymbol) {
+    this.suiteName = suiteName;
+    this.suiteSymbol = suiteSymbol;
+}
+
+String getSuiteName() {
+    return suiteName;
+}
+
+String getSuiteSymbol() {
+    return suiteSymbol;
+}
+}
+
+enum Figure {
+TWO("2", 2),
+THREE("3", 3),
+FOUR("4", 4),
+FIVE("5", 5),
+SIX("6", 6),
+SEVEN("7", 7),
+EIGHT("8", 8),
+NINE("9", 9),
+TEN("10", 10),
+JACK("J", 10),
+QUEEN("Q", 10),
+KING("K", 10),
+ACE("A", 11);
+
+final String figureName;
+final int figureValue;
+
+Figure(String figureName, int figureValue) {
+    this.figureName = figureName;
+    this.figureValue = figureValue;
+}
+
+String getFigureName() {
+    return figureName;
+}
+
+int getFigureValue() {
+    return figureValue;
+}
+}
+
+class Card {
+final Suite suite;
+final Figure figure;
+
+Card(Suite suite, Figure figure) {
+    this.suite = suite;
+    this.figure = figure;
+}
+
+String getCardName() {
+    return figure.getFigureName() + suite.getSuiteSymbol();
+}
+
+int getCardValue() {
+    return figure.getFigureValue();
+}
+}
+
+class Deck {
+Card[] cards = new Card[52];
+
+Deck() {
+    int index = 0;
+    for (Suite suite : Suite.values()) {
+        for (Figure figure : Figure.values()) {
+            cards[index] = new Card(suite, figure);
+            index++;
+        }
+    }
+}
+
+Card drawCard(Random random) {
+    int index = random.nextInt(52);
+    return cards[index]; // Robar una carta al azar
+}
+}
+
+class Blackjack {
+public static void main(String[] args) {
+Random random = new Random();
+Deck deck = new Deck();
+
+    Player player = new Player("Jugador");
+    Player dealer = new Player("Maquina");
+
+    // Robar dos cartas para el jugador y la máquina
+    player.addCard(deck.drawCard(random));
+    player.addCard(deck.drawCard(random));
+
+    dealer.addCard(deck.drawCard(random));
+    dealer.addCard(deck.drawCard(random));
+
+    // Mostrar puntajes
+    System.out.println("Puntaje de " + player.name + ": " + player.calculateScore());
+    System.out.println("Puntaje de " + dealer.name + ": " + dealer.calculateScore());
+
+    // Determinar el ganador
+    int playerScore = player.calculateScore();
+    int dealerScore = dealer.calculateScore();
+
+    if (playerScore > 21) {
+        System.out.println(dealer.name + " gana! (Jugador se pasa)");
+    } else if (dealerScore > 21) {
+        System.out.println(player.name + " gana! (Maquina se pasa)");
+    } else if (playerScore == dealerScore) {
+        System.out.println("Es un empate!");
+    } else if (playerScore > dealerScore) {
+        System.out.println(player.name + " gana!");
+    } else {
+        System.out.println(dealer.name + " gana!");
+    }
+}
+}
+
+class Player {
+String name;
+ArrayList hand = new ArrayList<>();
+
+Player(String name) {
+    this.name = name;
+}
+
+void addCard(Card card) {
+    hand.add(card);
+}
+
+int calculateScore() {
+    int score = 0;
+
+    for (Card card : hand) {
+        score += card.getCardValue();
+    }
+
+    return score; // El As siempre vale 11, así que no se ajusta.
+}
+}
